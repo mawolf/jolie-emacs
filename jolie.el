@@ -28,18 +28,11 @@
 (eval-when-compile
   (require 'regexp-opt))
 
-(defconst jolie-constant
-  (eval-when-compile
-    (regexp-opt
-     '("global" "constants" "cH" "instanceof" "interface" "Protocol" "Interfaces" "define" "Location" "Aggregates" "inputPort" "service" "outputPort" "OneWay" "RequestResponse" "execution" "comp" "concurrent" "nullProcess" "single" "sequential" "main" "init" "cset" "Redirects" "csets" "is_defined" "embedded" "extender" "Java" "Jolie" "JavaScript" "courier" "forward" "install" "undef" "include" "synchronized" "throws")))
-  "Jolie keywords.")
-
 (defconst jolie-keywords
   (eval-when-compile
     (regexp-opt
-     '("while" "for" "foreach" "with" "in" "spawn" "over" "type" "if" "else")))
+     '("global" "constants" "cH" "instanceof" "interface" "Protocol" "Interfaces" "define" "Location" "Aggregates" "inputPort" "service" "outputPort" "OneWay" "RequestResponse" "execution" "comp" "concurrent" "nullProcess" "single" "sequential" "main" "init" "cset" "Redirects" "csets" "is_defined" "embedded" "extender" "Java" "Jolie" "JavaScript" "courier" "forward" "install" "undef" "include" "synchronized" "throws" "while" "for" "foreach" "with" "in" "spawn" "over" "type" "if" "else")))
   "Jolie keywords.")
-
 
 (defconst jolie-types
   (eval-when-compile
@@ -47,14 +40,14 @@
      '("string" "int" "long" "bool" "undefined" "raw" "double" "void" "any")))
   "Jolie types.")
 
+(defconst jolie-operation-reference-regex
+  (rx "@" (0+ space) (group (1+ (or word (syntax symbol))))))
 
 (defconst jolie-font-lock-keywords
   (list
    (cons (concat "[^_$]?\\<\\(" jolie-keywords "\\)\\>[^_]?") '(1 font-lock-keyword-face))
-   (cons (concat "[^_$]?\\<\\(" jolie-constant "\\)\\>[^_]?") '(1 font-lock-constant-face))
-   (cons (concat "[^_$]?\\<\\(" jolie-types "\\)\\>[^_]?") '(1 font-lock-type-face)))
-
-  )
+   (cons (concat "[^_$]?\\<\\(" jolie-types "\\)\\>[^_]?") '(1 font-lock-type-face))
+   (list jolie-operation-reference-regex 1 'font-lock-function-name-face)))
 
 (defconst jolie-mode-syntax-table
   (let ((table (make-syntax-table)))
@@ -63,10 +56,12 @@
     ;; " is a string delimiter too
     (modify-syntax-entry ?\" "\"" table)
 
-    ;; / is punctuation, but // is a comment starter
-    (modify-syntax-entry ?/ ". 12" table)
-    ;; \n is a comment ender
-    (modify-syntax-entry ?\n ">" table)
+	;; support one and multi line comments
+	(modify-syntax-entry ?/ ". 124b" table)
+	(modify-syntax-entry ?* ". 23" table)
+	(modify-syntax-entry ?\n "> b"  table)
+	(modify-syntax-entry ?\^m "> b" table)
+	
     table))
 
 (define-derived-mode jolie-mode fundamental-mode
