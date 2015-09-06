@@ -4,6 +4,7 @@
 
 ;; Author: Martin Wolf
 ;; Keywords: extensions
+;; Version: 1.0.0
 
 ;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -25,6 +26,7 @@
 ;; 
 
 ;;; Code:
+
 (eval-when-compile
   (require 'regexp-opt))
 
@@ -55,7 +57,7 @@
     (modify-syntax-entry ?' "\"" table)
     ;; " is a string delimiter too
     (modify-syntax-entry ?\" "\"" table)
-
+	
 	;; support one and multi line comments
 	(modify-syntax-entry ?/ ". 124b" table)
 	(modify-syntax-entry ?* ". 23" table)
@@ -64,10 +66,22 @@
 	
     table))
 
+;;;###autoload
 (define-derived-mode jolie-mode fundamental-mode
   :syntax-table jolie-mode-syntax-table
   (setq font-lock-defaults '(jolie-font-lock-keywords))
   (setq mode-name "jolie lang mode")
   (font-lock-fontify-buffer) )
+
+(setq major-mode 'jolie-mode)
+(setq mode-name "Jolie")
+(run-hooks 'jolie-mode-hook)
+
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.ol\\'" . jolie-mode))
+;;;###autoload
+(add-to-list 'auto-mode-alist '("\\.iol\\'" . jolie-mode))
+
+(provide 'jolie-mode)
 
 ;;; jolie.el ends here
